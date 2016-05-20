@@ -1,0 +1,25 @@
+AllCops:
+  Exclude:
+    - lib/*
+  TargetRubyVersion: 2.3
+
+StringLiterals:
+  EnforcedStyle: single_quotes
+
+DotPosition:
+  EnforcedStyle: leading
+
+Metrics/LineLength:
+  Max: 200
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+ClassLength:
+  Enabled: false
+
+MethodLength:
+  Enabled: false
+
+Documentation:
+  Enabled: false
