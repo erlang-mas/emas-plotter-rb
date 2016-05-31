@@ -8,12 +8,15 @@ module EMAS
       end
 
       def run
-        database_builder = DB::Builder.new
-
-        database = database_builder.build_database
+        database = DB::Builder.new.build_database
 
         results_loader = ResultsLoader.new database, results_dir
         results_loader.load_results
+
+        data_points = Aggregator.new(database).aggregate
+
+        plot = Plot.new data_points
+        plot.draw
       end
     end
   end
