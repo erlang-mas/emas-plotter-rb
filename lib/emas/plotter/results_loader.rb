@@ -19,7 +19,8 @@ module EMAS
 
       def load_results
         experiments(results_dir) do |experiment_dir, experiment_name|
-          experiment_id = create_experiment experiment_name
+          nodes_count = nodes experiment_dir
+          experiment_id = create_experiment experiment_name, nodes_count
 
           nodes(experiment_dir) do |node_dir|
             database.transaction do
@@ -52,11 +53,18 @@ module EMAS
       end
 
       def traverse(dir, entry_regex)
+        entries_count = 0
+
         Dir.foreach(dir) do |entry|
           next unless entry =~ entry_regex
+
+          entries_count += 1
           entry_path = File.join dir, entry
-          yield entry_path, entry
+
+          yield entry_path, entry if block_given?
         end
+
+        entries_count
       end
 
       def process_metric_file(experiment_id, metric_path)
@@ -74,8 +82,11 @@ module EMAS
         keys.zip(metric_entry[1..5]).to_h
       end
 
-      def create_experiment(experiment_name)
-        database[:experiments].insert name: experiment_name
+      def create_experiment(experiment_name, nodes_count)
+        database[:experiments].insert(
+          name:        experiment_name,
+          nodes_count: nodes_count
+        )
       end
 
       def create_result(experiment_id, result)
