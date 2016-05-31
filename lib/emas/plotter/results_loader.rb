@@ -1,3 +1,5 @@
+require 'ruby-progressbar'
+
 module EMAS
   module Plotter
     class ResultsLoader
@@ -30,6 +32,8 @@ module EMAS
                 end
               end
             end
+
+            progress_bar.increment
           end
         end
       end
@@ -92,7 +96,25 @@ module EMAS
       def create_result(experiment_id, result)
         database[:results].insert experiment_id: experiment_id, **result
       end
-    end
 
+      def progress_bar
+        @progress_bar ||= ProgressBar.create(
+          total:  items_count,
+          format: '%a %e %P% Processed: %c from %C'
+        )
+      end
+
+      def items_count
+        @items_count ||= begin
+          counter = 0
+
+          experiments(results_dir) do |experiment_dir|
+            counter += nodes experiment_dir
+          end
+
+          counter
+        end
+      end
+    end
   end
 end
