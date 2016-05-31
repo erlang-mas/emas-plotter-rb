@@ -4,7 +4,7 @@ module EMAS
       attr_reader :database, :results_dir
 
       ENTRY_REGEX = {
-        experiment: /\A\w{32}\z/,
+        experiment: /\A\w{16}\z/,
         node:       /\An\d+-\w+\.zeus\z/,
         island:     /\A<\d+\.\d+\.\d+>\z/,
         metric:     /\A\w+\.txt\z/
