@@ -1,5 +1,3 @@
-require 'pry'
-
 module EMAS
   module Plotter
     class Aggregator
@@ -98,7 +96,7 @@ module EMAS
       end
 
       def build_data_points
-        average_reproductions_per_second.to_a.map(&:values).transpose
+        average_reproductions_per_second_with_std.map(&:values).transpose
       end
 
       def average_reproductions_per_second
@@ -109,6 +107,37 @@ module EMAS
             .select(:nodes_count)
             .select_append { avg(:value).as(:average_reproductions) }
         end
+      end
+
+      def average_reproductions_per_second_with_std
+        @average_reproductions_per_second_with_std ||= begin
+          results = average_reproductions_per_second.to_a
+
+          results.each do |result|
+            result[:standard_deviation] = calculate_standard_deviation result
+          end
+
+          results
+        end
+      end
+
+      def calculate_standard_deviation(result)
+        result =
+          database[:experiments]
+            .join(:reproductions_per_second) do |reproductions_per_second, experiment|
+              { Sequel.qualify(experiment, :id) => Sequel.qualify(reproductions_per_second, :experiment_id) }
+            end
+            .select(:nodes_count)
+            .select_append do
+              sum((value - result[:average_reproductions]) * (value - result[:average_reproductions])).as(:standard_deviation)
+            end
+            .select_append do
+              count(value).as(samples_count)
+            end
+            .group(:nodes_count)
+
+        result = result.to_a.first
+        (result[:standard_deviation] / result[:samples_count]) ** (1.0 / 2)
       end
     end
   end

@@ -27,8 +27,13 @@ module EMAS
             plot.yrange '[0:]'
             plot.nokey
 
-            plot.data << Gnuplot::DataSet.new(data_points) do |ds|
+            plot.data << Gnuplot::DataSet.new(data_points[0..1]) do |ds|
               ds.with = "linespoints"
+              ds.notitle
+            end
+
+            plot.data << Gnuplot::DataSet.new(data_points[0..2]) do |ds|
+              ds.with = "errorbars"
               ds.notitle
             end
           end
