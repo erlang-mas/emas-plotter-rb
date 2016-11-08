@@ -30,7 +30,7 @@ module EMAS
             .group(:experiment_id, :second, :node)
             .select(:experiment_id, :node, :second)
             .select_append { sum(value).as(value) }
-            .having { { count(island) => 12 } }
+            .having { { count(island) => 24 } }
         end
       end
 
@@ -58,7 +58,7 @@ module EMAS
 
       def trim_boundary_seconds
         database[:reproductions_per_second]
-          .where(Sequel.~(second: 15..75))
+          .where(Sequel.~(second: 5..25))
           .delete
       end
 

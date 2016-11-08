@@ -7,12 +7,13 @@ module EMAS
 
       ENTRY_REGEX = {
         experiment: /\A\w{16}\z/,
-        node:       /\An\d+-\w+\.zeus\z/,
+        node:       /\Ap\d+\z/,
         island:     /\A<\d+\.\d+\.\d+>\z/,
         metric:     /\A\w+\.txt\z/
       }.freeze
 
-      METRIC_ENTRY_REGEX = /'(.+)'\s+\[(.+),(.+)\]\s+{{.+,(.+),.+},(.+)}/
+      METRIC_ENTRY_REGEX = /(.+)\s+\[(.+),(.+)\]\s+{{.+,(.+),.+},(.+)}/
+
 
       def initialize(database, results_dir)
         @database = database
@@ -75,7 +76,6 @@ module EMAS
         File.readlines(metric_path).each do |metric_entry|
           match = METRIC_ENTRY_REGEX.match metric_entry
           next unless match
-
           result = normalize_metric_entry match
           create_result experiment_id, result
         end
