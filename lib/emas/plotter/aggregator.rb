@@ -63,8 +63,8 @@ module EMAS
       end
 
       def trim_boundary_seconds
-        database[:reproductions_per_second]
-          .where(Sequel.~(second: 5..25))
+        database[:reproductions_per_node]
+          .where(Sequel.~(second: 15..75))
           .delete
       end
 
