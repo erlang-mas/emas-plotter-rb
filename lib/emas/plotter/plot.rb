@@ -3,10 +3,11 @@ require 'gnuplot'
 module EMAS
   module Plotter
     class Plot
-      attr_reader :data_points
+      attr_reader :data_points, :metric
 
-      def initialize(data_points)
+      def initialize(data_points, metric)
         @data_points = data_points
+        @metric = metric
       end
 
       def draw
@@ -18,9 +19,13 @@ module EMAS
       def draw_plot_from_data_points
         Gnuplot.open do |gnuplot|
           Gnuplot::Plot.new(gnuplot) do |plot|
-            plot.title  'EMAS'
-            plot.ylabel 'Reproductions / s'
+            metric_name = Utils.humanize(metric).capitalize
+
+            plot.title  "EMAS - #{metric_name.capitalize}"
+
+            plot.ylabel "#{Utils.pluralize(metric_name)} / s"
             plot.xlabel 'Nodes count'
+
             plot.grid
 
             plot.xrange '[1:]'

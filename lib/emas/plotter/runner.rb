@@ -29,7 +29,7 @@ module EMAS
         data_points = Aggregator.new(database, @metric).aggregate
 
         logger.info 'Plotting'
-        plot = Plot.new data_points
+        plot = Plot.new data_points, @metric
         plot.draw
 
         logger.info 'Done'
