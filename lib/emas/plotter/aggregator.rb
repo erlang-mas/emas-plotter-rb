@@ -1,10 +1,11 @@
 module EMAS
   module Plotter
     class Aggregator
-      attr_reader :database
+      attr_reader :database, :metric
 
-      def initialize(database)
+      def initialize(database, metric)
         @database = database
+        @metric = metric
       end
 
       def aggregate
@@ -32,7 +33,7 @@ module EMAS
       def reproductions_per_node_aggregation
         @reproductions_per_node_aggregation ||= begin
           database[:results]
-            .where(metric: 'reproduction')
+            .where(metric: metric)
             .group(:experiment_id, :second, :node)
             .select(:experiment_id, :node, :second)
             .select_append { sum(value).as(value) }
