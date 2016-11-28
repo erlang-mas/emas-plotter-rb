@@ -6,6 +6,7 @@ module EMAS
       desc 'plot', 'Plots simulation results'
       method_option :db,     type: :string
       method_option :metric, type: :string, default: 'reproduction'
+      method_option :output, type: :string
 
       def plot(results_dir = nil)
         unless results_dir || options[:db]

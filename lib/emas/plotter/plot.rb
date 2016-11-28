@@ -3,11 +3,12 @@ require 'gnuplot'
 module EMAS
   module Plotter
     class Plot
-      attr_reader :data_points, :metric
+      attr_reader :data_points, :metric, :output
 
-      def initialize(data_points, metric)
+      def initialize(data_points, metric, output)
         @data_points = data_points
         @metric = metric
+        @output = output
       end
 
       def draw
@@ -20,6 +21,9 @@ module EMAS
         Gnuplot.open do |gnuplot|
           Gnuplot::Plot.new(gnuplot) do |plot|
             metric_name = Utils.humanize(metric).capitalize
+
+            plot.set 'terminal', 'png'
+            plot.output output if output
 
             plot.title  "EMAS - #{metric_name.capitalize}"
 
