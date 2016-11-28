@@ -1,3 +1,5 @@
+require 'logger'
+
 module EMAS
   module Plotter
     class Runner
@@ -12,23 +14,31 @@ module EMAS
 
       def run
         if @db_path
-          $stdout.puts "Restoring results from db file: #{@db_path}"
+          logger.info "Restoring results from db file: #{@db_path}"
           database = Sequel.sqlite @db_path
         else
-          $stdout.puts 'Building database'
+          logger.info 'Building database'
           database = DB::Builder.new.build_database
 
-          $stdout.puts 'Loading results'
+          logger.info 'Loading results'
           results_loader = ResultsLoader.new database, results_dir
           results_loader.load_results
         end
 
-        $stdout.puts 'Performing results aggregation'
+        logger.info 'Performing results aggregation'
         data_points = Aggregator.new(database, @metric).aggregate
 
-        $stdout.puts 'Plotting'
+        logger.info 'Plotting'
         plot = Plot.new data_points
         plot.draw
+
+        logger.info 'Done'
+      end
+
+      private
+
+      def logger
+        @logger ||= Logger.new STDOUT
       end
     end
   end
