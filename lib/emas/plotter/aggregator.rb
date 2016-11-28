@@ -8,6 +8,7 @@ module EMAS
       end
 
       def aggregate
+        clear_aggregation_tables
         aggregate_reproductions_per_node
         normalize_seconds
         aggregate_reproductions_per_second
@@ -15,6 +16,11 @@ module EMAS
       end
 
       private
+
+      def clear_aggregation_tables
+        database[:reproductions_per_node].truncate
+        database[:reproductions_per_second].truncate
+      end
 
       def aggregate_reproductions_per_node
         database[:reproductions_per_node].import(
