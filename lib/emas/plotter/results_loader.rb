@@ -14,7 +14,6 @@ module EMAS
 
       METRIC_ENTRY_REGEX = /(.+)\s+\[(.+),(.+)\]\s+{{.+,(.+),.+},(.+)}/
 
-
       def initialize(database, results_dir)
         @database = database
         @results_dir = results_dir

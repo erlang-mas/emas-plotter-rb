@@ -131,20 +131,20 @@ module EMAS
       def calculate_standard_deviation(result)
         result =
           database[:experiments]
-            .join(:reproductions_per_second) do |reproductions_per_second, experiment|
-              { Sequel.qualify(experiment, :id) => Sequel.qualify(reproductions_per_second, :experiment_id) }
-            end
-            .select(:nodes_count)
-            .select_append do
-              sum((value - result[:average_reproductions]) * (value - result[:average_reproductions])).as(:standard_deviation)
-            end
-            .select_append do
-              count(value).as(samples_count)
-            end
-            .group(:nodes_count)
+          .join(:reproductions_per_second) do |reproductions_per_second, experiment|
+            { Sequel.qualify(experiment, :id) => Sequel.qualify(reproductions_per_second, :experiment_id) }
+          end
+          .select(:nodes_count)
+          .select_append do
+            sum((value - result[:average_reproductions]) * (value - result[:average_reproductions])).as(:standard_deviation)
+          end
+          .select_append do
+            count(value).as(samples_count)
+          end
+          .group(:nodes_count)
 
         result = result.to_a.first
-        (result[:standard_deviation] / result[:samples_count]) ** (1.0 / 2)
+        (result[:standard_deviation] / result[:samples_count])**(1.0 / 2)
       end
     end
   end

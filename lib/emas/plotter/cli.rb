@@ -9,7 +9,7 @@ module EMAS
 
       def plot(results_dir = nil)
         unless results_dir || options[:db]
-          $stderr.puts "You must provide at least results dir or db path"
+          $stderr.puts 'You must provide at least results dir or db path'
           exit 1
         end
 
