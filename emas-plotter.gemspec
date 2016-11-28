@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'thor'
   spec.add_dependency 'sequel'
+  spec.add_dependency 'sqlite3'
   spec.add_dependency 'gnuplot'
   spec.add_dependency 'ruby-progressbar'
 end
