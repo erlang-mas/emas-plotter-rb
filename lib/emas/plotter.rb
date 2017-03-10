@@ -1,15 +1,18 @@
+require 'securerandom'
+require 'fileutils'
+
+require 'sequel'
+require 'gnuplot'
+require 'ruby-progressbar'
+
 require 'emas/plotter/version'
-
-require 'emas/plotter/utils'
-
-require 'emas/plotter/db/schema_loader'
-require 'emas/plotter/db/builder'
-
-require 'emas/plotter/results_loader'
-require 'emas/plotter/aggregator'
-require 'emas/plotter/plot'
-require 'emas/plotter/runner'
 require 'emas/plotter/cli'
+require 'emas/plotter/db'
+require 'emas/plotter/results_loader'
+require 'emas/plotter/aggregators'
+require 'emas/plotter/plots'
+require 'emas/plotter/runner'
+require 'emas/plotter/utils'
 
 module EMAS
   module Plotter

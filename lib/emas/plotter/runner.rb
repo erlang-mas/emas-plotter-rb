@@ -3,40 +3,47 @@ require 'logger'
 module EMAS
   module Plotter
     class Runner
-      attr_reader :results_dir
+      METRICS = %i(fitness reproduction migration node_migration)
+
+      attr_reader :results_dir, :options
 
       def initialize(results_dir, options = {})
         @results_dir = results_dir
-
-        @db_path = options[:db]
-        @metric  = options[:metric]
-        @output  = options[:output]
+        @options = options
       end
 
       def run
-        if @db_path
-          logger.info "Restoring results from db file: #{@db_path}"
-          database = Sequel.sqlite @db_path
-        else
-          logger.info 'Building database'
-          database = DB::Builder.new.build_database
+        logger.info 'Preparing database'
+        database = prepare_database
 
-          logger.info 'Loading results'
-          results_loader = ResultsLoader.new database, results_dir
-          results_loader.load_results
+        METRICS.each do |metric|
+          logger.info "[#{metric}] Peforming results aggregation"
+          data_sets = Aggregators.for(metric).new(database, metric).aggregate
+
+          logger.info "[#{metric}] Plotting"
+          Plots.for(metric).new(data_sets, metric, output_dir).draw
+          logger.info 'Done'
         end
-
-        logger.info 'Performing results aggregation'
-        data_points = Aggregator.new(database, @metric).aggregate
-
-        logger.info 'Plotting'
-        plot = Plot.new data_points, @metric, @output
-        plot.draw
 
         logger.info 'Done'
       end
 
       private
+
+      def prepare_database
+        return Sequel.sqlite db_path if db_path
+        database = DB::Builder.new.build_database
+        ResultsLoader.new(database, results_dir).load_results
+        database
+      end
+
+      def db_path
+        options[:db]
+      end
+
+      def output_dir
+        options[:output]
+      end
 
       def logger
         @logger ||= Logger.new STDOUT

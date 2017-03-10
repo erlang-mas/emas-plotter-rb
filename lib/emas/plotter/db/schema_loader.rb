@@ -17,9 +17,11 @@ module EMAS
         def create_database_tables
           create_experiments_table
           create_results_table
-          create_reproductions_per_node_table
-          create_reproductions_per_second_table
+          create_metric_per_second_table
+          create_behaviour_per_node_table
+          create_behaviour_per_second_table
         end
+
 
         def create_experiments_table
           database.create_table :experiments do
@@ -34,15 +36,24 @@ module EMAS
             primary_key :id
             foreign_key :experiment_id, :experiments
             column      :node,          :string
-            column      :island,        :string
+            column      :population,    :string
             column      :metric,        :string
             column      :second,        :integer
             column      :value,         :float
           end
         end
 
-        def create_reproductions_per_node_table
-          database.create_table :reproductions_per_node do
+        def create_metric_per_second_table
+          database.create_table :metric_per_second do
+            primary_key :id
+            foreign_key :experiment_id, :experiments
+            column      :second,        :integer
+            column      :value,         :float
+          end
+        end
+
+        def create_behaviour_per_node_table
+          database.create_table :behaviour_per_node do
             primary_key :id
             foreign_key :experiment_id, :experiments
             column      :node,          :string
@@ -51,8 +62,8 @@ module EMAS
           end
         end
 
-        def create_reproductions_per_second_table
-          database.create_table :reproductions_per_second do
+        def create_behaviour_per_second_table
+          database.create_table :behaviour_per_second do
             primary_key :id
             foreign_key :experiment_id, :experiments
             column      :node,          :string

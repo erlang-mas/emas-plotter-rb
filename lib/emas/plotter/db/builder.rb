@@ -1,6 +1,3 @@
-require 'sequel'
-require 'securerandom'
-
 module EMAS
   module Plotter
     module DB

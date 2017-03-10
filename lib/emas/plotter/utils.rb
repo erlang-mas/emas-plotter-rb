@@ -1,6 +1,6 @@
 module Utils
   def humanize(str)
-    str.tr('_', ' ')
+    str.to_s.tr('_', ' ')
   end; module_function :humanize
 
   def pluralize(str)

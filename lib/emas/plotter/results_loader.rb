@@ -1,18 +1,15 @@
-require 'ruby-progressbar'
-
 module EMAS
   module Plotter
     class ResultsLoader
       attr_reader :database, :results_dir
 
       ENTRY_REGEX = {
+        node_count: /\A\d+\z/,
         experiment: /\A\w{16}\z/,
-        node:       /\Ap\d+\z/,
-        island:     /\A<\d+\.\d+\.\d+>\z/,
-        metric:     /\A\w+\.txt\z/
+        node:       /\Aemas-\d{2,3}@\w+\z/,
+        population: /\A(\<\d+\.\d+\.\d+>)|global\z/,
+        metric:     /\A\w+\z/
       }.freeze
-
-      METRIC_ENTRY_REGEX = /(.+)\s+\[(.+),(.+)\]\s+{{.+,(.+),.+},(.+)}/
 
       def initialize(database, results_dir)
         @database = database
@@ -20,25 +17,30 @@ module EMAS
       end
 
       def load_results
-        experiments(results_dir) do |experiment_dir, experiment_name|
-          nodes_count = nodes experiment_dir
-          experiment_id = create_experiment experiment_name, nodes_count
+        node_counts(results_dir) do |nodes_count_dir, nodes_count|
+          experiments(nodes_count_dir) do |experiment_dir, experiment|
+            experiment_id = create_experiment experiment, nodes_count
 
-          nodes(experiment_dir) do |node_dir|
-            database.transaction do
-              islands(node_dir) do |island_dir|
-                metrics(island_dir) do |metric_path|
-                  process_metric_file experiment_id, metric_path
+            nodes(experiment_dir) do |node_dir, node|
+              database.transaction do
+                populations(node_dir) do |population_dir, population|
+                  metrics(population_dir) do |metric_path, metric|
+                    process_metric_file metric_path, experiment_id, node, population, metric
+                  end
                 end
               end
-            end
 
-            progress_bar.increment
+              progress_bar.increment
+            end
           end
         end
       end
 
       private
+
+      def node_counts(dir, &block)
+        traverse dir, ENTRY_REGEX[:node_count], &block
+      end
 
       def experiments(dir, &block)
         traverse dir, ENTRY_REGEX[:experiment], &block
@@ -48,8 +50,8 @@ module EMAS
         traverse dir, ENTRY_REGEX[:node], &block
       end
 
-      def islands(dir, &block)
-        traverse dir, ENTRY_REGEX[:island], &block
+      def populations(dir, &block)
+        traverse dir, ENTRY_REGEX[:population], &block
       end
 
       def metrics(dir, &block)
@@ -71,18 +73,18 @@ module EMAS
         entries_count
       end
 
-      def process_metric_file(experiment_id, metric_path)
+      def process_metric_file(metric_path, experiment_id, node, population, metric)
         File.readlines(metric_path).each do |metric_entry|
-          match = METRIC_ENTRY_REGEX.match metric_entry
-          next unless match
-          result = normalize_metric_entry match
+          timestamp, value = metric_entry.strip.split(",")
+          entry = [node, population, metric, timestamp, value]
+          result = normalize_metric_entry entry
           create_result experiment_id, result
         end
       end
 
       def normalize_metric_entry(metric_entry)
-        keys = %i(node island metric second value)
-        keys.zip(metric_entry[1..5]).to_h
+        keys = %i(node population metric second value)
+        keys.zip(metric_entry).to_h
       end
 
       def create_experiment(experiment_name, nodes_count)
@@ -107,8 +109,10 @@ module EMAS
         @items_count ||= begin
           counter = 0
 
-          experiments(results_dir) do |experiment_dir|
-            counter += nodes experiment_dir
+          node_counts(results_dir) do |nodes_count_dir|
+            experiments(nodes_count_dir) do |experiment_dir|
+              counter += nodes experiment_dir
+            end
           end
 
           counter

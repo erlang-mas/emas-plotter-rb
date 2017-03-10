@@ -9,3 +9,5 @@
 /tmp/
 /.db/
 /scripts/
+*.png
+results
