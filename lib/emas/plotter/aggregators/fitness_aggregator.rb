@@ -65,7 +65,7 @@ module EMAS
           database[:experiments]
             .join(:metric_per_second, experiment_id: :id)
             .select_group(:nodes_count, :second)
-            .select_append { max(value).as(value) }
+            .select_append { avg(value).as(value) }
             .to_hash_groups(:nodes_count, [:second, :value])
         end
       end
