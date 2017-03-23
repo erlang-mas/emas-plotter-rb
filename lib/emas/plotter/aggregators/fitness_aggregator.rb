@@ -25,6 +25,7 @@ module EMAS
         def fitness_per_second_aggregation
           database[:results]
             .where(metric: 'fitness')
+            .where { value > -10_000_000 }
             .select_group(:experiment_id, :second)
             .select_append { max(value).as(value) }
         end
