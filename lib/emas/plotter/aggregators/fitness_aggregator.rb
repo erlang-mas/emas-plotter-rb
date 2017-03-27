@@ -24,10 +24,10 @@ module EMAS
 
         def fitness_per_second_aggregation
           database[:results]
-            .where(metric: 'fitness')
+            .where(metric: metric.to_s)
             .where { value > -10_000_000 }
             .select_group(:experiment_id, :second)
-            .select_append { max(value).as(value) }
+            .select_append { avg(value).as(value) }
         end
 
         def normalize_seconds
@@ -56,7 +56,9 @@ module EMAS
         def build_data_sets
           data_sets = fetch_data_sets
           data_sets.each_pair do |nodes_count, data_points|
-            data_sets[nodes_count] = data_points.transpose
+            x, y = data_points.transpose
+            # data_sets[nodes_count] = [x, y.map { |y_dp| y_dp.abs + 0.001 }]
+            data_sets[nodes_count] = [x, y]
           end
           data_sets
         end

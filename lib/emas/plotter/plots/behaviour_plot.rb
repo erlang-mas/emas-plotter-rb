@@ -12,8 +12,8 @@ module EMAS
           plot.ylabel "#{Utils.pluralize(metric_name)} / s"
           plot.xlabel 'Nodes count'
 
-          plot.xrange '[1:]'
-          plot.yrange '[0:]'
+        #   plot.xrange '[10:100]'
+        #   plot.yrange '[0:]'
 
           plot.data << Gnuplot::DataSet.new(data_sets[0..1]) do |ds|
             ds.with = 'linespoints'

@@ -9,6 +9,8 @@ module EMAS
         case metric
         when :fitness
           FitnessPlot
+        when :agents_count
+          FitnessPlot
         else
           BehaviourPlot
         end

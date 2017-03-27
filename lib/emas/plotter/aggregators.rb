@@ -9,6 +9,8 @@ module EMAS
         case metric
         when :fitness
           FitnessAggregator
+        when :agents_count
+          FitnessAggregator
         else
           BehaviourAggregator
         end

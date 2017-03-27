@@ -27,7 +27,7 @@ module EMAS
           database.create_table :experiments do
             primary_key :id
             column      :name,        :string
-            column      :nodes_count, :integer
+            column      :nodes_count, :string
           end
         end
 

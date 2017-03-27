@@ -4,7 +4,7 @@ module EMAS
       attr_reader :database, :results_dir
 
       ENTRY_REGEX = {
-        node_count: /\A\d+\z/,
+        node_count: /\A\w+\z/,
         experiment: /\A\w{16}\z/,
         node:       /\Aemas-\d{2,3}@\w+\z/,
         population: /\A(\<\d+\.\d+\.\d+>)|global\z/,

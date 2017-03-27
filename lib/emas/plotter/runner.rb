@@ -3,7 +3,8 @@ require 'logger'
 module EMAS
   module Plotter
     class Runner
-      METRICS = %i(fitness reproduction migration node_migration)
+      # METRICS = %i(fitness reproduction migration node_migration)
+      METRICS = %i(agents_count)
 
       attr_reader :results_dir, :options
 
